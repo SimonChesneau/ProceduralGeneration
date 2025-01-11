@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import perso.Coordinate;
@@ -23,7 +24,16 @@ public class CircleFilter extends Filter{
 	private myCell eastNeighbour;
 	private myCell westNeighbour;
 	
+	private int islandNumberFactor = 8;
+	private int islandSizeFactor = 10;
+	private int mountainPresenceFactor = 15;
+	private int mountainSizeFactor= 10;
+	private int snowPresenceFactor = 30;
+	private int forestPresenceFactor=5;
+	
 	private Set<myCell> neighbourSet;
+	
+	private Map<String, Integer> neighbourCellsCount;
 	
 	public CircleFilter() {
 		neighbourSet = new HashSet<>();
@@ -100,7 +110,6 @@ public class CircleFilter extends Filter{
 		neighbourSet.add(southWestNeighbour);
 	}
 
-	
 	public myCell getEastNeighbour() {
 		if(eastNeighbour == null)
 			return myJFrame.baseCell;
@@ -130,35 +139,142 @@ public class CircleFilter extends Filter{
 
 	@Override
 	public void applyColor() {
-		Map<String, Integer> neighbourCellsCount = countNeighbours();
+		countNeighbours();
 		String currentCellEnvironmentName = getCurrentCell().getEnvironment().getEnvironmentName();
+		Random rand = myJFrame.rand;		
 		
+		if(currentCellEnvironmentName.equals("Sand") && neighbourCellsCount.get("Ocean") >= 3)
+			getCurrentCell().setEnvironment(Environment.oceanEnvironment);
+		
+		if(currentCellEnvironmentName.equals("Plain") && neighbourCellsCount.get("Ocean") >= 3)
+			getCurrentCell().setEnvironment(Environment.oceanEnvironment);
 		
 		if(currentCellEnvironmentName.equals("Sand") && neighbourCellsCount.get("Beach") >= 4)
 			getCurrentCell().setEnvironment(Environment.oceanEnvironment);
 		
-		else if(currentCellEnvironmentName.equals("Sand") && neighbourCellsCount.get("Ocean") >= 4)
+		if(currentCellEnvironmentName.equals("Sand") && neighbourCellsCount.get("Ocean") >= 4)
 			getCurrentCell().setEnvironment(Environment.oceanEnvironment);
 		
-		/*else if(currentCellEnvironmentName.equals("Ocean") && neighbourCellsCount.get("Plain") > 0)
-			getCurrentCell().setEnvironment(Environment.beachEnvironment);
-		else if(currentCellEnvironmentName.equals("Plain") && neighbourCellsCount.get("Ocean") > 0)
-			getCurrentCell().setEnvironment(Environment.beachEnvironment);*/
 		
-		/*if(neighbourCellsCount.get("Beach") == 8)
-			getCurrentCell().setEnvironment(Environment.beachEnvironment);
-		if(neighbourCellsCount.get("Ocean") == 8)
-			getCurrentCell().setEnvironment(Environment.oceanEnvironment);
-		if(neighbourCellsCount.get("Plain") == 8)
-			getCurrentCell().setEnvironment(Environment.plainEnvironment);*/
-	
-		getCurrentCell().colorCell();
+		if(currentCellEnvironmentName.equals("Plain") && neighbourCellsCount.get("Plain") <= 2)
+			getCurrentCell().setEnvironment(Environment.plainEnvironment);
+		
+		if(neighbourCellsCount.get("Ocean") >= 5) {
+			int randomFactor = rand.nextInt(0, 101);
+			if(randomFactor > islandNumberFactor)
+				getCurrentCell().setEnvironment(Environment.oceanEnvironment);
+			else
+				getCurrentCell().setEnvironment(Environment.beachEnvironment);
+		}
+		
+		if(currentCellEnvironmentName.equals("Ocean") && neighbourCellsCount.get("Ocean") > 0 && neighbourCellsCount.get("Beach") > 0 ) {
+			int randomFactor = rand.nextInt(0, 101);
+			if(randomFactor > islandSizeFactor)
+				getCurrentCell().setEnvironment(Environment.oceanEnvironment);
+			else
+				getCurrentCell().setEnvironment(Environment.beachEnvironment);
+		}
+		
+		if(currentCellEnvironmentName.equals("Beach") && neighbourCellsCount.get("Ocean") == 0 && neighbourCellsCount.get("Beach") > 0 ) {
+			int randomFactor = rand.nextInt(0, 101);
+			if(randomFactor > 15)
+				getCurrentCell().setEnvironment(Environment.plainEnvironment);
+			else
+				getCurrentCell().setEnvironment(Environment.beachEnvironment);
+		}
+		
+		
+		if(currentCellEnvironmentName.equals("Ocean") && (neighbourCellsCount.get("Beach") == 1 || neighbourCellsCount.get("Beach") == 2)) {
+			int randomFactor = rand.nextInt(0, 101);
+			if(randomFactor > islandSizeFactor)
+				getCurrentCell().setEnvironment(Environment.oceanEnvironment);
+			else
+				getCurrentCell().setEnvironment(Environment.beachEnvironment);
+		}
+		
+		if(currentCellEnvironmentName.equals("Plain") && neighbourCellsCount.get("Plain") == 8) {
+			int randomFactor = rand.nextInt(0, 101);
+			if(randomFactor > mountainPresenceFactor)
+				getCurrentCell().setEnvironment(Environment.plainEnvironment);
+			else
+				getCurrentCell().setEnvironment(Environment.mountainEnvironment);
+		}else if(currentCellEnvironmentName.equals("Plain") && neighbourCellsCount.get("Plain") >= 7) {
+			int randomFactor = rand.nextInt(0, 101);
+			if(randomFactor > forestPresenceFactor)
+				getCurrentCell().setEnvironment(Environment.plainEnvironment);
+			else
+				getCurrentCell().setEnvironment(Environment.forestEnvironment);
+		}
+		
+		if(currentCellEnvironmentName.equals("Plain") && neighbourCellsCount.get("Mountain") >= 1) {
+			int randomFactor = rand.nextInt(0, 101);
+			if(randomFactor > mountainSizeFactor)
+				getCurrentCell().setEnvironment(Environment.plainEnvironment);
+			else
+				getCurrentCell().setEnvironment(Environment.mountainEnvironment);
+		} 
+		
+		if(currentCellEnvironmentName.equals("Mountain") && neighbourCellsCount.get("Mountain") == 8) {
+			int randomFactor = rand.nextInt(0, 101);
+			if(randomFactor > snowPresenceFactor)
+				getCurrentCell().setEnvironment(Environment.mountainEnvironment);
+			else
+				getCurrentCell().setEnvironment(Environment.snowEnvironment);
+		}
+		
+		fermeture(false);
 		
 	}
 
-	private Map<String, Integer> countNeighbours() {
+	public void fermeture(boolean isFinal) {
+		String currentCellEnvironmentName = getCurrentCell().getEnvironment().getEnvironmentName();
+		
+		if(!isFinal) {
+			
+			if(neighbourCellsCount != null) {
+				
+				if(neighbourCellsCount.get("Beach") >= 7  && !currentCellEnvironmentName.equals("Mountain"))
+					getCurrentCell().setEnvironment(Environment.beachEnvironment);
+				if(neighbourCellsCount.get("Ocean") >= 7  && !currentCellEnvironmentName.equals("Mountain"))
+					getCurrentCell().setEnvironment(Environment.oceanEnvironment);
+				if(neighbourCellsCount.get("Plain") >= 7  && !currentCellEnvironmentName.equals("Mountain") && !currentCellEnvironmentName.equals("Forest"))
+					getCurrentCell().setEnvironment(Environment.plainEnvironment);
+				if(neighbourCellsCount.get("Mountain") >= 5 && !currentCellEnvironmentName.equals("Snow"))
+					getCurrentCell().setEnvironment(Environment.mountainEnvironment);
+				if(neighbourCellsCount.get("Snow") >= 2 && neighbourCellsCount.get("Plain") == 0 && neighbourCellsCount.get("Beach") == 0 && currentCellEnvironmentName.equals("Mountain"))
+					getCurrentCell().setEnvironment(Environment.snowEnvironment);
+				if(neighbourCellsCount.get("Forest") >= 2 && neighbourCellsCount.get("Beach") == 0 && neighbourCellsCount.get("Snow") == 0 && currentCellEnvironmentName.equals("Plain"))
+					getCurrentCell().setEnvironment(Environment.forestEnvironment);
+			
+				
+				if(currentCellEnvironmentName.equals("Ocean") && neighbourCellsCount.get("Ocean") <= 1) {
+					if(neighbourCellsCount.get("Beach") >= neighbourCellsCount.get("Plain"))
+						getCurrentCell().setEnvironment(Environment.beachEnvironment);
+					else
+						getCurrentCell().setEnvironment(Environment.plainEnvironment);
+				}
+			}
+		}else {
+			if(neighbourCellsCount.get("Beach") >= 7 && !currentCellEnvironmentName.equals("Beach"))
+				getCurrentCell().setEnvironment(Environment.beachEnvironment);
+			if(neighbourCellsCount.get("Ocean") >= 7 && !currentCellEnvironmentName.equals("Ocean"))
+				getCurrentCell().setEnvironment(Environment.oceanEnvironment);
+			if(neighbourCellsCount.get("Plain") >= 7 && !currentCellEnvironmentName.equals("Plain"))
+				getCurrentCell().setEnvironment(Environment.plainEnvironment);
+			if(neighbourCellsCount.get("Mountain") >= 7 )
+				getCurrentCell().setEnvironment(Environment.mountainEnvironment);
+			if(neighbourCellsCount.get("Snow") >= 7 )
+				getCurrentCell().setEnvironment(Environment.snowEnvironment);
+			if(neighbourCellsCount.get("Forest") >= 7 )
+				getCurrentCell().setEnvironment(Environment.forestEnvironment);
+		}
+		countNeighbours();
+		getCurrentCell().colorCell();
+	}
+
+	private void countNeighbours() {
 		Map<String, Integer> neighbourCellsCount = new HashMap<>();
-		for(Environment env : myJFrame.environmentColorList)
+		for(Environment env : myJFrame.allEnvironmentColorList)
 			neighbourCellsCount.put(env.getEnvironmentName(), 0);
 		
 		neighbourCellsCount.put("default", 0);
@@ -172,7 +288,8 @@ public class CircleFilter extends Filter{
 			neighbourCellsCount.put(environmentName, count);
 		
 		}
-		return neighbourCellsCount;
+		
+		this.neighbourCellsCount= neighbourCellsCount; 
 	}
 
 	@Override

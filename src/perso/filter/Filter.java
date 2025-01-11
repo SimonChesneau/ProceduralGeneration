@@ -10,6 +10,7 @@ public abstract class Filter {
 	public abstract Set<myCell> getNeighbourSet();
 	public abstract void applyColor();
 	public abstract void setNeighbours();
+	public abstract void fermeture(boolean isFinal);
 	public myCell getCurrentCell() {
 		return currentCell;
 	}

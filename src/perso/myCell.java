@@ -18,12 +18,19 @@ public class myCell extends JPanel{
 	
 	private Coordinate cellCoordinates;
 	private Environment environment;
+	private double theoricalDistanceTillFinishingPoint;
+	private double cellPathValue;
 	
 	public myCell(int cellRowNumber, int cellColNumber, Filter filter) {
+		super.setSize(super.getWidth(), super.getWidth());
+		super.repaint();
+		
+		cellPathValue=0;
+		
+		
 		this.cellCoordinates = new Coordinate(cellRowNumber, cellColNumber);
 		
 		this.setBackground(baseColor);
-		this.setBorder(cellBorder);
 		
 		this.filter = filter;
 		this.filter.setCurrentCell(this);
@@ -66,9 +73,36 @@ public class myCell extends JPanel{
 
 	public Environment getEnvironment() {
 		if(environment == null)
-			return new Environment("default", baseColor);
+			return new Environment("default", baseColor,10000);
 		return environment;		
 	}
+
+	public void setTheoricalDistanceTillFinishingPoint(double theoricalDistanceTillFinishingPoint) {
+		this.theoricalDistanceTillFinishingPoint = theoricalDistanceTillFinishingPoint;
+	}
+
+	public double getTheoricalDistanceTillFinishingPoint() {
+		return theoricalDistanceTillFinishingPoint;
+	}
 	
+	public void activateLineBorder() {
+		this.setBorder(cellBorder);
+		this.repaint();
+	}
+
+	
+	@Override
+	public String toString() {
+		return "myCell [cellCoordinates=" + cellCoordinates.toString() + "]";
+	}
+
+	public double getCellPathValue() {
+		return cellPathValue;
+	}
+
+	public void setCellPathValue(double cellPathValue) {
+		this.cellPathValue = cellPathValue;
+	}
+
 	
 }
