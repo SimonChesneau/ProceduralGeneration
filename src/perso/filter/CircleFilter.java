@@ -24,12 +24,60 @@ public class CircleFilter extends Filter{
 	private myCell eastNeighbour;
 	private myCell westNeighbour;
 	
-	private int islandNumberFactor = 8;
-	private int islandSizeFactor = 10;
-	private int mountainPresenceFactor = 15;
-	private int mountainSizeFactor= 10;
-	private int snowPresenceFactor = 30;
-	private int forestPresenceFactor=5;
+	private static int islandNumberFactor = 8;
+	public static int getIslandNumberFactor() {
+		return islandNumberFactor;
+	}
+
+	public static void setIslandNumberFactor(int islandNumberFactor) {
+		CircleFilter.islandNumberFactor = islandNumberFactor;
+	}
+
+	public static int getIslandSizeFactor() {
+		return islandSizeFactor;
+	}
+
+	public static void setIslandSizeFactor(int islandSizeFactor) {
+		CircleFilter.islandSizeFactor = islandSizeFactor;
+	}
+
+	public static int getMountainPresenceFactor() {
+		return mountainPresenceFactor;
+	}
+
+	public static void setMountainPresenceFactor(int mountainPresenceFactor) {
+		CircleFilter.mountainPresenceFactor = mountainPresenceFactor;
+	}
+
+	public static int getMountainSizeFactor() {
+		return mountainSizeFactor;
+	}
+
+	public static void setMountainSizeFactor(int mountainSizeFactor) {
+		CircleFilter.mountainSizeFactor = mountainSizeFactor;
+	}
+
+	public static int getSnowPresenceFactor() {
+		return snowPresenceFactor;
+	}
+
+	public static void setSnowPresenceFactor(int snowPresenceFactor) {
+		CircleFilter.snowPresenceFactor = snowPresenceFactor;
+	}
+
+	public static int getForestPresenceFactor() {
+		return forestPresenceFactor;
+	}
+
+	public static void setForestPresenceFactor(int forestPresenceFactor) {
+		CircleFilter.forestPresenceFactor = forestPresenceFactor;
+	}
+
+	private static int islandSizeFactor = 10;
+	private static int mountainPresenceFactor = 15;
+	private static int mountainSizeFactor= 10;
+	private static int snowPresenceFactor = 30;
+	private static int forestPresenceFactor=5;
 	
 	private Set<myCell> neighbourSet;
 	
@@ -280,13 +328,14 @@ public class CircleFilter extends Filter{
 		neighbourCellsCount.put("default", 0);
 		
 		for(myCell neighbourCell : neighbourSet) {
-			String environmentName = neighbourCell.getEnvironment().getEnvironmentName();
-			
-			int count = neighbourCellsCount.get(environmentName);
-			count++;
-			neighbourCellsCount.remove(environmentName);
-			neighbourCellsCount.put(environmentName, count);
-		
+			if(neighbourCell != null) {
+				String environmentName = neighbourCell.getEnvironment().getEnvironmentName();
+				
+				int count = neighbourCellsCount.get(environmentName);
+				count++;
+				neighbourCellsCount.remove(environmentName);
+				neighbourCellsCount.put(environmentName, count);
+			}
 		}
 		
 		this.neighbourCellsCount= neighbourCellsCount; 

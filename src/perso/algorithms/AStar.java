@@ -12,7 +12,7 @@ import perso.myCell;
 public class AStar implements SearchAlgorithm{
 	
 	private Map<myCell,myCell> foundPath;
-	
+
 	List<myCell> closedList;
 	List<myCell> openList;
 	
@@ -113,4 +113,7 @@ public class AStar implements SearchAlgorithm{
 		}
 	}
 		
+	public Map<myCell, myCell> getFoundPath() {
+		return foundPath;
+	}
 }

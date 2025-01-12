@@ -100,4 +100,7 @@ public class Dijkstra implements SearchAlgorithm{
 		}
 	}
 
+	public Map<myCell, myCell> getFoundPath() {
+		return foundPath;
+	}
 }
