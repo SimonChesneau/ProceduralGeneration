@@ -1,4 +1,4 @@
-![alt text]([https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?](https://github.com/SimonChesneau/ProceduralGeneration/blob/main/procedural%20generation.png)raw=true)
+![alt text](https://github.com/SimonChesneau/ProceduralGeneration/blob/main/procedural%20generation.png?raw=true)
 # ProceduralGeneration
 
 The ProceduralGeneration code will create a random map based on multiple rules. Thoses maps are composed of multiple environlent based on color:
